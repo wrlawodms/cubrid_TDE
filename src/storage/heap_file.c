@@ -5528,8 +5528,8 @@ heap_reuse (THREAD_ENTRY * thread_p, const HFID * hfid, const OID * class_oid, c
   assert (!OID_ISNULL (class_oid));
 
   VPID_SET_NULL (&last_vpid);
-  addr.vfid = &hfid->vfid;
 
+  addr.vfid = &hfid->vfid;
   /*
    * Read the header page.
    * We lock the header page in exclusive mode.
