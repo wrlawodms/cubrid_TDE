@@ -14,7 +14,7 @@ jobs:
     name: code-style
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get -y install astyle
+      - run: sudo apt-get -y install astyle26
       - id: files
         uses: jitterbit/get-changed-files@v1  
       - run: |
