@@ -18,9 +18,8 @@ jobs:
         uses: jitterbit/get-changed-files@v1  
       - run: |
           for f in ${{ steps.files.outputs.added_modified }}; do
-            astyle26 --style=gnu --mode=c --indent-namespaces --indent=spaces=2 -xT8 -xt4 --add-brackets --max-code-length=120 --align-pointer=name --indent-classes --pad-header --pad-first-paren-out ${f}
-            ;;
-            diff ${f}.orig ${f}
+            astyle26 --style=gnu --mode=c --indent-namespaces --indent=spaces=2 -xT8 -xt4 --add-brackets --max-code-length=120 --align-pointer=name --indent-classes --pad-header --pad-first-paren-out ${f};
+            diff ${f}.orig ${f};
           done 
   cppcheck:
     name: cppcheck
