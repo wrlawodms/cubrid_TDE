@@ -5189,7 +5189,6 @@ heap_create_internal (THREAD_ENTRY * thread_p, HFID * hfid, const OID * class_oi
 
   if (prm_get_bool_value (PRM_ID_DONT_REUSE_HEAP_FILE) == false && 
   file_type = FILE_HEAP) 
-  == FILE_HEAP)
     {
       /*
        * Try to reuse an already mark deleted heap file
