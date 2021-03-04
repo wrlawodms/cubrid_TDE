@@ -14,22 +14,14 @@ jobs:
     name: code-style
     runs-on: ubuntu-latest
     steps:
-      - run: echo code style!
+      - id: files
+        uses: jitterbit/get-changed-files@v1  
+      - run: |
+          for f in ${{ steps.files.outputs.added_modified }}; do
+            echo "Do something with this ${f}."
+          done 
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: jitterbit/get-changed-files@v1  
-      - run: |
-          for changed_file in ${{ steps.files.outputs.all }}; do
-            echo "Do something with this ${changed_file}."
-          done 
-      - uses: actions/checkout@v2
-      - uses: deep5050/cppcheck-action@main
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN}}
-      - name: publish report    
-        uses: mikeal/publish-to-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: 'github-action' # your branch name goes here
+      - run: echo "cppcheck!"; -1;
