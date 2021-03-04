@@ -21,7 +21,7 @@ jobs:
         uses: jitterbit/get-changed-files@v1
       - run: |
           for f in ${{ steps.files.outputs.added_modified }}; do
-            ext=$(expr "$f" : ".*\..*\)")
+            ext=$(expr $f : ".*\(\..*\)")
             case $ext in
             .c|.h|.i)
               indent -l120 -lc120 ${f}
