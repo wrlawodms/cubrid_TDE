@@ -34,7 +34,7 @@ jobs:
             esac
           done 
           git diff | tee gitdiff;
-          test -s gitdiff # is not empty?
+          test ! -s gitdiff # empty -> 0, not empty -> 1
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
