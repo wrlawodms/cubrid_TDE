@@ -34,7 +34,6 @@
 #include <errno.h>
 
 #include "heap_file.h"
-
 #include "porting.h"
 #include "porting_inline.hpp"
 #include "record_descriptor.hpp"
