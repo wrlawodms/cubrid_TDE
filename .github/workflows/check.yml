@@ -53,7 +53,7 @@ jobs:
           tool_name: code-style (indent, astyle)
       - name: Check success
         run: |
-          git diff > gitdiff
+          git diff | tee gitdiff
           test ! -s gitdiff # is empty? yes: 0 no: 1
   cppcheck:
     name: cppcheck
