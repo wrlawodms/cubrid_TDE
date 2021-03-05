@@ -62,7 +62,7 @@ jobs:
         if: ${{ steps.stylecheck.outcome == 'failure' }}
         uses: peter-evans/create-or-update-comment@v1
         with:
-          issue-number: 5 #${{ github.event.pull_request.number }} 
+          issue-number: ${{ github.event.pull_request.number }}
           body: ${{ steps.get-comment-body.outputs.body }}
   cppcheck:
     name: cppcheck
