@@ -51,18 +51,8 @@ jobs:
           done 
           git diff | tee gitdiff
           test ! -s gitdiff # empty -> 0, not empty -> 1
-      - uses: actions/setup-go@v2
-      - name: install shellcheck
-	run: |
-	    scversion="latest"
-	    wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv
-	    sudo cp "shellcheck-${scversion}/shellcheck" /usr/local/bin/
-	    rm -rf "shellcheck-${scversion}/shellcheck"
-      - run: shellcheck -f diff $(shfmt -f .) | patch -p1      
-      - name: suggester / shfmt
+      - name: suggester
         uses: reviewdog/action-suggester@v1
-        with:
-          tool_name: shfmt 
       - name: Get comment body
         id: get-comment-body
         if: ${{ steps.stylecheck.outcome == 'failure' }}
