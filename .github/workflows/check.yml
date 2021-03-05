@@ -53,7 +53,7 @@ jobs:
       - id: get-comment-body
         if: ${{ steps.stylecheck.outcome == 'failure' }}
         run: |
-          body=$(cat gitiff)
+          body=$(cat dgitdiff)
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'%0A'}"
           body="${body//$'\r'/'%0D'}" 
