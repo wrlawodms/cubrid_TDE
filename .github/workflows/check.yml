@@ -49,7 +49,7 @@ jobs:
           done 
       - name: suggester
         uses: reviewdog/action-suggester@v1
-	with:
+	with: |
           tool_name: ${{ stylecheck.name }} (indent, astyle)        
   cppcheck:
     name: cppcheck
