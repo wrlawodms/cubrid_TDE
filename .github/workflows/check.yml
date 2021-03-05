@@ -17,7 +17,7 @@ jobs:
       - name: install packages
         run: |
           sudo apt-get -y install astyle
-          sudo apt-get -y install indent=2.2.11
+          sudo apt-get -y install indent_2.2.11
       - uses: actions/checkout@v2
       - id: files
         uses: jitterbit/get-changed-files@v1
