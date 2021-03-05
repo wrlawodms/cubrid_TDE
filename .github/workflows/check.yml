@@ -14,7 +14,7 @@ jobs:
     name: code-style
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get -y install astyle=3.1, indent=2.2.11
+      - run: sudo apt-get -y install astyle, indent
       - uses: actions/checkout@v2
       - id: files
         uses: jitterbit/get-changed-files@v1
