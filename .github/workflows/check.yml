@@ -51,6 +51,14 @@ jobs:
           done 
           git diff | tee gitdiff
           test ! -s gitdiff # empty -> 0, not empty -> 1
+      - uses: actions/setup-go@v2
+      - run: echo ::add-path::$(go env GOPATH)/bin
+      - run: GO111MODULE=on go get mvdan.cc/sh/v3/cmd/shfmt
+      - run: shfmt -i 2 -ci -w .
+      - name: suggester / shfmt
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: shfmt 
       - name: Get comment body
         id: get-comment-body
         if: ${{ steps.stylecheck.outcome == 'failure' }}
