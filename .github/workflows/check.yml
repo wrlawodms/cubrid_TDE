@@ -47,10 +47,14 @@ jobs:
             ;;
             esac
           done 
-      - name: Suggest code change
+      - name: Suggest code changes
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: code-style (indent, astyle)
+      - name: Check success
+        run: |
+          git diff > gitdiff
+          test ! -s gitdiff # is empty? yes: 0 no: 1
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
