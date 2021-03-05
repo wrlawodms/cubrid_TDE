@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo apt-get -y install build-essential texi2html cat
           
-          # indent 2.2.11
+          # indent 2.2.11, the lastest version (2.2.12) make a different result
           sudo apt-get -y install wget
           wget https://ftp.gnu.org/gnu/indent/indent-2.2.11.tar.gz
           tar xf indent-2.2.11.tar.gz
@@ -63,7 +63,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }} 
-	  body: ${{ steps.get-comment-body.outputs.body }}
+	  body: test  #${{ steps.get-comment-body.outputs.body }}
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
