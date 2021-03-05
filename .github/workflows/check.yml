@@ -47,10 +47,12 @@ jobs:
             ;;
             esac
           done 
-      - run:
           git diff | tee gitdiff
           test ! -s gitdiff # empty -> 0, not empty -> 1
-        if: failure (steps.stylecheck)
+        continue-on-error
+      - run: \
+          cat gitdiff 
+        if: {{ steps.stylecheck == failrue }}
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
