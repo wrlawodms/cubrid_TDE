@@ -52,7 +52,7 @@ jobs:
           test ! -s gitdiff # empty -> 0, not empty -> 1
       - run: \
           cat gitdiff 
-        if: ${{ steps.stylecheck == "failure" }}
+        if: ${{ steps.stylecheck.outcome == "failure" }}
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
