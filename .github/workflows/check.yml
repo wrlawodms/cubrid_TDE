@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: install packages
         run: |
-          sudo apt-get -y install build-essential texi2html cat
+          sudo apt-get -y install build-essential texi2html
           
           # indent 2.2.11, the lastest version (2.2.12) make a different result
           sudo apt-get -y install wget
@@ -62,8 +62,8 @@ jobs:
         if: ${{ steps.stylecheck.outcome == 'failure' }}
         uses: peter-evans/create-or-update-comment@v1
         with:
-          issue-number: ${{ github.event.pull_request.number }} 
-          # body: test  #${{ steps.get-comment-body.outputs.body }}
+          issue-number: 5 #${{ github.event.pull_request.number }} 
+          body: ${{ steps.get-comment-body.outputs.body }}
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
