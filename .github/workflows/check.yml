@@ -16,11 +16,10 @@ jobs:
     steps:
       - name: install packages
         run: |
-          sudo apt-get -y install build-essential 
+          sudo apt-get -y install build-essential texi2html
           sudo apt-get -y install wget
-          sudo apt-get -y install astyle
           wget https://ftp.gnu.org/gnu/indent/indent-2.2.11.tar.gz
-          tar xvf indent-2.2.11.tar.gz
+          tar xf indent-2.2.11.tar.gz
           cd indent-2.2.11
           ./configure
           make -j install
@@ -34,16 +33,16 @@ jobs:
             ext=$(expr $f : ".*\(\..*\)")
             case $ext in
             .c|.h|.i)
-              echo "C-files";
+              echo "C-files"
               indent -l120 -lc120 ${f}
             ;;
             .cpp|.hpp|.ipp)
-              echo "CPP";
+              echo "CPP"
             ~/bin/astyle26 --style=gnu --mode=c --indent-namespaces --indent=spaces=2 -xT8 -xt4 --add-brackets --max-code-length=120 --align-pointer=name --indent-classes --pad-header --pad-first-paren-out ${f}
             ;;
             esac
           done 
-          git diff | tee gitdiff;
+          git diff | tee gitdiff
           test ! -s gitdiff # empty -> 0, not empty -> 1
   cppcheck:
     name: cppcheck
