@@ -17,13 +17,17 @@ jobs:
       - name: install packages
         run: |
           sudo apt-get -y install build-essential texi2html
+          
+          # indent 2.2.11
           sudo apt-get -y install wget
           wget https://ftp.gnu.org/gnu/indent/indent-2.2.11.tar.gz
           tar xf indent-2.2.11.tar.gz
           cd indent-2.2.11
           ./configure
-          make -j install
+          sudo make -j install
           cd ..
+
+          # astyle
           sudo apt-get -y install astyle
       - uses: actions/checkout@v2
       - id: files
