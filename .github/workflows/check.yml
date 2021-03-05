@@ -52,9 +52,13 @@ jobs:
           git diff | tee gitdiff
           test ! -s gitdiff # empty -> 0, not empty -> 1
       - uses: actions/setup-go@v2
-      - run: echo ::add-path::$(go env GOPATH)/bin
-      - run: GO111MODULE=on go get mvdan.cc/sh/v3/cmd/shfmt
-      - run: shfmt -i 2 -ci -w .
+      - name: install shellcheck
+	run: |
+	    scversion="latest"
+	    wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv
+	    sudo cp "shellcheck-${scversion}/shellcheck" /usr/local/bin/
+	    rm -rf "shellcheck-${scversion}/shellcheck"
+      - run: shellcheck -f diff $(shfmt -f .) | patch -p1      
       - name: suggester / shfmt
         uses: reviewdog/action-suggester@v1
         with:
