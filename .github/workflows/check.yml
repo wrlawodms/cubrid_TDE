@@ -47,7 +47,7 @@ jobs:
             ;;
             esac
           done 
-      - name: suggester
+      - name: Suggest code change
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: code-style (indent, astyle)
