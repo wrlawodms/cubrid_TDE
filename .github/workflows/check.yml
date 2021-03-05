@@ -34,7 +34,7 @@ jobs:
         uses: jitterbit/get-changed-files@v1
       - name: Check code style
         id: stylecheck
-        # continue-on-error: true
+        continue-on-error: true
         run: |
           for f in ${{ steps.files.outputs.added_modified }}; do
             ext=$(expr $f : ".*\(\..*\)")
@@ -47,14 +47,14 @@ jobs:
             ;;
             esac
           done 
-      - name: Suggest code changes
-        uses: reviewdog/action-suggester@v1
-        with:
-          tool_name: code-style (indent, astyle)
       - name: Check success
         run: |
           git diff | tee gitdiff
           test ! -s gitdiff # is empty? yes: 0 no: 1
+      - name: Suggest code changes
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: code-style (indent, astyle)
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
