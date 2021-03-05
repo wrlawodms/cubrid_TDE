@@ -16,8 +16,16 @@ jobs:
     steps:
       - name: install packages
         run: |
+          sudo apt-get -y install build-essential 
+          sudo apt-get -y install wget
           sudo apt-get -y install astyle
-          sudo apt-get -y install indent_2.2.11
+          wget https://ftp.gnu.org/gnu/indent/indent-2.2.11.tar.gz
+          tar xvf indent-2.2.11.tar.gz
+          cd indent-2.2.11
+          ./configure
+          make -j install
+          cd ..
+          sudo apt-get -y install astyle
       - uses: actions/checkout@v2
       - id: files
         uses: jitterbit/get-changed-files@v1
