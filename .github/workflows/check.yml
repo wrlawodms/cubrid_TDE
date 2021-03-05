@@ -65,9 +65,11 @@ jobs:
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body: \
-            Code style error.
-            ```${{ steps.get-comment-body.outputs.body }}```
+          body: |
+            'Code style error.
+            ```
+            ${{ steps.get-comment-body.outputs.body }}
+            ```'
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
