@@ -24,7 +24,7 @@ jobs:
             ext=$(expr $f : ".*\(\..*\)")
             case $ext in
             .c|.h|.i)
-              echo "C";
+              echo "C-files";
               indent -l120 -lc120 ${f}
             ;;
             .cpp|.hpp|.ipp)
@@ -32,8 +32,9 @@ jobs:
             ~/bin/astyle26 --style=gnu --mode=c --indent-namespaces --indent=spaces=2 -xT8 -xt4 --add-brackets --max-code-length=120 --align-pointer=name --indent-classes --pad-header --pad-first-paren-out ${f}
             ;;
             esac
-            git diff;
           done 
+          git diff ${f} > ${f}.diff;
+          [ -s ${f} ] # is not empty?
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
