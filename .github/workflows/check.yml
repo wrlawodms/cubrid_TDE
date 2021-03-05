@@ -50,7 +50,7 @@ jobs:
       - name: suggester
         uses: reviewdog/action-suggester@v1
         with:
-          tool_name: ${{ stylecheck.name }} (indent, astyle)
+          tool_name: ${{ steps.stylecheck.name }} (indent, astyle)
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-latest
