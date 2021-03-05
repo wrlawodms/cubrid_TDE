@@ -25478,6 +25478,8 @@ heap_log_postpone_heap_append_pages (THREAD_ENTRY * thread_p, const HFID * hfid,
     }
 
   assert ((ptr - log_data) ==  log_data_size);
+  // code-style test
+  assert ((ptr-log_data) ==    log_data_size);       
 
   log_append_postpone (thread_p, RVHF_APPEND_PAGES_TO_HEAP, &log_addr, log_data_size, log_data);
 

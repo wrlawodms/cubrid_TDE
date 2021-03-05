@@ -105,8 +105,7 @@ void
 tx_transient_class_registry::map (const map_func_type &func) const
 {
   bool stop = false;
-  for (const auto &it : m_list)
-    {
+  for (const auto &it : m_list) {
       func (it, stop);
       if (stop)
 	{
