@@ -1,4 +1,4 @@
-name: Check
+name: Check # 빼먹을 경우 그냥 이 파일 경로가 출력됨. 없앨 수 없나..
 on: 
   pull_request:
     branches: [ github-action ]
@@ -57,5 +57,11 @@ jobs:
     name: cppcheck
     runs-on: ubuntu-latest
     steps:
-      - run: echo "cppcheck!"; -1;
+      - name: Install packages
+        run: sudo apt-get install -y cppcheck 
+      - uses: actions/checkout@v2
+      - name: cppcheck
+        run: |
+          cppcheck --force -j4 --suppressions-list=.github/workflows/cppcheck-spr-list --enable=warning -iheaplayers src 2>cppcheck.result
+          cat cppcheck.result
 
