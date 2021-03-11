@@ -45,7 +45,7 @@ jobs:
               astyle --style=gnu --mode=c --indent-namespaces --indent=spaces=2 -xT8 -xt4 --add-brackets --max-code-length=120 --align-pointer=name --indent-classes --pad-header --pad-first-paren-out ${f}
             ;;
             esac
-            git diff > gitdiff
+            git diff | tee gitdiff
             test ! -s gitdiff # is empty? yes: 0 no: 1
           done 
       - name: Suggest code changes
@@ -62,6 +62,20 @@ jobs:
       - uses: actions/checkout@v2
       - name: cppcheck
         run: |
-          cppcheck --force -j4 --suppressions-list=.github/workflows/cppcheck-spr-list --enable=warning -iheaplayers src 2>cppcheck.result
-          cat cppcheck.result
-
+          # to suppress other error, add it to .github/workflows/cppcheck-spr-list
+          cppcheck --force -j4 --suppressions-list=.github/workflows/cppcheck-spr-list --enable=warning -iheaplayers src 2>cppcheck.result 
+          cat cppcheck.result | grep " warning: " | wc -l
+          echo "errors: `cat cppcheck.result | grep " error: " | wc -l`" > cppcheck.summary
+          echo "warnings: `cat cppcheck.result | grep " warning: " | wc -l`" >> cppcheck.summary
+      - id: get-comment-body
+        run: |
+          body=$(cat cppchck.summary)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}" 
+          echo ::set-output name=body::$body
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.get-comment-body.outputs.body }}
