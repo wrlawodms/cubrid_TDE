@@ -79,10 +79,19 @@ jobs:
           body="${body//$'\r'/'%0D'}" 
           echo ::set-output name=body::$body
       - name: Report cppcheck.summary
-        if: ${{ failure() }}
-        uses: peter-evans/create-or-update-comment@v1
+        uses: unsplash/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
+          check_for_duplicate_msg: true  # OPTIONAL 
+          msg: |
             **cppcheck**
             ${{ steps.get-comment-body.outputs.body }}
+            #- name: Report cppcheck.summary
+            #  if: ${{ failure() }}
+            #   uses: peter-evans/create-or-update-comment@v1
+            # with:
+            # issue-number: ${{ github.event.pull_request.number }}
+            # body: |
+            # **cppcheck**
+            # ${{ steps.get-comment-body.outputs.body }}
