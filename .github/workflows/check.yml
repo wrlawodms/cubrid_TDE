@@ -68,9 +68,10 @@ jobs:
           echo "warnings: `cat cppcheck.result | grep " warning: " | wc -l`" >> cppcheck.summary
           echo "-----------------------------Result-------------------------------------"
           cat cppcheck.summary
-          ! cat cppcheck.result | grep " error: " 1>/dev/null # if has error, fail
+          ! cat cppcheck.result | grep " error: " 1>/dev/null # if has errors, fail
       - name: Get cppcheck.summary
         id: get-comment-body
+        if: ${{ failure() }}
         run: |
           body=$(cat cppcheck.summary)
           body="${body//'%'/'%25'}"
@@ -78,6 +79,7 @@ jobs:
           body="${body//$'\r'/'%0D'}" 
           echo ::set-output name=body::$body
       - name: Report cppcheck.summary
+        if: ${{ failure() }}
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
