@@ -1,4 +1,3 @@
-name: Checking
 on: 
   pull_request:
     branches: [ github-action ]
