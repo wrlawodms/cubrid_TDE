@@ -88,3 +88,11 @@ jobs:
           msg: |
             **cppcheck**
             ${{ steps.get-comment-body.outputs.body }}
+        #- name: Report cppcheck.summary
+        #  if: ${{ failure() }}
+        #   uses: peter-evans/create-or-update-comment@v1
+        # with:
+        # issue-number: ${{ github.event.pull_request.number }}
+        # body: |
+        # **cppcheck**
+        # ${{ steps.get-comment-body.outputs.body }}
