@@ -1,3 +1,3 @@
-## http://jira.cubrid.org/browse/CBRD-0001
+http://jira.cubrid.org/browse/CBRD-XXXX
 
-## Describe here
+Describe here
