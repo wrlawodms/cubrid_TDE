@@ -25,6 +25,7 @@ jobs:
           done
 
           cat violating_files
+          ls -l violating_files
           
           if [ -s violating_files ]; then
             echo "Violating files:"
