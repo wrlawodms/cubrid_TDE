@@ -19,7 +19,6 @@ jobs:
 
           for f in ${{ steps.files.outputs.added_modified }}; do
             head -n $license_lines $f > extracted_license
-            cmp -s $license_header extracted_license
             echo "D"
             echo $f
             if [ $? -ne 0 ]; then
