@@ -12,7 +12,6 @@ jobs:
         id: files
       - name: Check license
         run: |
-          sudo apt-get insatll -yq cmp
           license_header=.github/workflows/license_header.txt
           license_lines=`wc -l < $license_header`
           touch violating_files
