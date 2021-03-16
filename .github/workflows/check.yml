@@ -8,7 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: files
-        uses: jitterbit/get-changed-files@v1
+      - uses: actions/checkout@v2
+      - uses: jitterbit/get-changed-files@v1
       - name: Check license
         run: |
           license_header=.github/workflows/license_header.txt
