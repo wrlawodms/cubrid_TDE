@@ -14,15 +14,20 @@ jobs:
         run: |
           license_header=.github/workflows/license_header.txt
           license_lines=`wc -l < $license_header`
-          violate=0
+          touch violating_files
+
           for f in ${{ steps.files.outputs.added_modified }}; do
             head -n $license_lines $f  | cmp -s $license_header
             if $? then
-              echo '$f does not contain the proper license header'
-              violate=1
+              echo $f >> violating_files
             fi
           done
-          exit $violate
+          
+          if [ -s violating_files ]; then
+            echo "Violating files:"
+            cat violating_files
+            exit 1
+          fi
   pr-style:
     name: pr-style
     runs-on: ubuntu-latest
