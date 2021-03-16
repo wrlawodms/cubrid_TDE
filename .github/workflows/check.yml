@@ -29,7 +29,6 @@ jobs:
           if [ -s violating_files ]; then
             echo "Violating files:"
             cat violating_files
-            exit 1
           fi
   pr-style:
     name: pr-style
