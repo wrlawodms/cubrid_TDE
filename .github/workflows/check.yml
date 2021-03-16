@@ -16,17 +16,23 @@ jobs:
           license_lines=`wc -l < $license_header`
           touch violating_files
           echo "A"
+
           for f in ${{ steps.files.outputs.added_modified }}; do
+            echo "C"
             head -n $license_lines $f | cmp -s $license_header
+            echo "D"
             echo $f
             if [ $? -ne 0 ]; then
               echo $f
               echo $f >> violating_files
             fi
           done
+          
           echo "B"
+
           cat violating_files
           ls -l violating_files
+          
           if [ -s violating_files ]; then
             echo "Violating files:"
             cat violating_files
