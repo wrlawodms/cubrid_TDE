@@ -13,7 +13,7 @@ jobs:
   license:
     name: license
     runs-on: ubuntu-latest
-      - name: validate-license-action
+      - name: Validate license
  	uses: datreeio/validate-license-action@v1.0.0
         args: Apache
   code-style:
