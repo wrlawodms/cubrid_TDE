@@ -17,11 +17,14 @@ jobs:
           touch violating_files
 
           for f in ${{ steps.files.outputs.added_modified }}; do
-            head -n $license_lines $f  | cmp -s $license_header
+            head -n $license_lines $f | cmp -s $license_header
             if [ $? -ne 0 ]; then
+              echo $f
               echo $f >> violating_files
             fi
           done
+
+          cat violating_files
           
           if [ -s violating_files ]; then
             echo "Violating files:"
