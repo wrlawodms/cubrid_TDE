@@ -3,6 +3,25 @@ on:
   pull_request:
     branches: [ github-action ]
 jobs:
+  license:
+    name: license
+    runs-on: ubuntu-latest
+    runs: 
+      - id: files
+        uses: jitterbit/get-changed-files@v1
+      - name: Check license
+        run: |
+          license_header=.github/workflows/license_header.txt
+          license_lines=`wc -l < $license_header`
+          violate=0
+          for f in ${{ steps.files.outputs.added_modified }}; do
+            head -n $license_lines $f  | cmp -s $license_header
+            if $? then
+              echo '$f does not contain the proper license header'
+              violate=1
+            fi
+          done
+          if $violate then exit 1 fi
   pr-style:
     name: pr-style
     runs-on: ubuntu-latest
@@ -10,13 +29,6 @@ jobs:
       - uses: deepakputhraya/action-pr-title@master
         with:
           regex: '^\[[A-Z]+-\d+\]\s.+' # Regex the title should match.
-  license:
-    name: license
-    runs-on: ubuntu-latest
-    steps:
-      - uses: datreeio/validate-license-action@v1.0.0
-        with:
-          args: Apache
   code-style:
     name: code-style
     runs-on: ubuntu-latest
