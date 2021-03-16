@@ -6,7 +6,7 @@ jobs:
   license:
     name: license
     runs-on: ubuntu-latest
-    runs: 
+    steps:
       - id: files
         uses: jitterbit/get-changed-files@v1
       - name: Check license
