@@ -21,7 +21,7 @@ jobs:
               violate=1
             fi
           done
-          if $violate then exit 1 fi
+          exit $violate
   pr-style:
     name: pr-style
     runs-on: ubuntu-latest
