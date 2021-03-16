@@ -10,6 +10,12 @@ jobs:
       - uses: deepakputhraya/action-pr-title@master
         with:
           regex: '^\[[A-Z]+-\d+\]\s.+' # Regex the title should match.
+  license:
+    name: license
+    runs-on: ubuntu-latest
+      - name: validate-license-action
+ 	uses: datreeio/validate-license-action@v1.0.0
+        args: Apache
   code-style:
     name: code-style
     runs-on: ubuntu-latest
