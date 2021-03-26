@@ -12,6 +12,7 @@ jobs:
         id: files
       - name: Check license
         run: |
+          set +e # make this step proceed if a command returns non-zero
           license_headers=.github/workflows/license_headers
           result="PASS"
 
@@ -19,9 +20,7 @@ jobs:
             result_for_f="FAIL"
             for header in `find $license_headers -type f`; do
               line_cnt=`wc -l < $header`
-              set +e # make this step proceed if a command returns non-zero
               head -n $line_cnt $f | diff -w - $header 2>&1 1>/dev/null
-              set -e
               if [ $? -eq 0 ]; then
                 result_for_f="PASS"
                 break
