@@ -15,11 +15,18 @@ jobs:
           license_headers=.github/workflows/license_headers
 
           for f in ${{ steps.files.outputs.added_modified }}; do
-            echo "Checking $f"
             for header in `find $license_headers -type f`; do
               line_cnt=`wc -l < $header`
+              result=""
               ! head -n $line_cnt $f | diff -w - $header 2>&1 1>/dev/null
+              if [ $? -eq 0 ]; then
+                result="PASS"
+                break
+              fi
             done
+            if [ -z $result ]; then
+              echo "$f doesn't have a proper license header"
+            fi 
           done
   pr-style:
     name: pr-style
