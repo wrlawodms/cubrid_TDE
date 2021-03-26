@@ -12,6 +12,7 @@ jobs:
         id: files
       - name: Check license
         run: |
+          set +e # make this step proceed if a command returns non-zero
           license_headers=.github/workflows/license_headers
           result="PASS"
 
