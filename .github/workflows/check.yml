@@ -13,11 +13,11 @@ jobs:
       - name: Check license
         run: |
           license_headers=.github/workflows/license_headers
-          license_lines=`wc -l < $license_header`
 
           for f in ${{ steps.files.outputs.added_modified }}; do
             echo "Checking $f"
             for header in `find $license_headers -type f`; do
+              line_cnt=`wc -l < $header`
               ! head -n $line_cnt $f | diff -w - $header 2>&1 1>/dev/null
             done
           done
