@@ -16,8 +16,8 @@ jobs:
           result="PASS"
 
           for f in ${{ steps.files.outputs.added_modified }}; do
+            result_for_f="FAIL"
             for header in `find $license_headers -type f`; do
-              result_for_f="FAIL"
               line_cnt=`wc -l < $header`
               echo $header
               head -n $line_cnt $f | diff -w - $header 2>&1 1>/dev/null
