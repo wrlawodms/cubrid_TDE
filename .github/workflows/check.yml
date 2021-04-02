@@ -1,7 +1,10 @@
 name: github-checks
 on: 
   pull_request:
-    branches: [ github-action ]
+    branches:
+      - github-action
+      - feature/**
+      - release/11.*
 jobs:
   license:
     name: license
