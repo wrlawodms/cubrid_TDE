@@ -1,6 +1,8 @@
 @echo off
 rem batch script for CUBRID Environments, (window services, registry)
 
+rem TEST
+
 rem LOADING CUBRID Environments
 echo Setting CUBRID Environments
 
