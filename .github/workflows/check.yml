@@ -106,7 +106,7 @@ jobs:
           result_file="cppcheck.result"
           summary_file="cppcheck.summary"
 
-          touch $resule_file
+          touch $result_file
           touch $summary_file
 
           # to suppress other error, add it to .github/workflows/cppcheck-spr-list
