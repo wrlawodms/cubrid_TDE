@@ -21,6 +21,10 @@ jobs:
           result="PASS"
 
           for f in ${{ steps.files.outputs.added_modified }}; do
+            if [ -d "$f" ]; then
+              continue
+            fi
+
             result_for_f="FAIL"
             for header in `find $license_headers -type f`; do
               line_cnt=`wc -l < $header`
@@ -30,6 +34,7 @@ jobs:
                 break
               fi
             done
+
             echo "$f: $result_for_f"
             if [ "$result_for_f" = "FAIL" ]; then
               result="FAIL"
