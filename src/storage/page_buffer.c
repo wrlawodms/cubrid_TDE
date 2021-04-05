@@ -16,7 +16,7 @@
  *
  */
 
-/*
+/* TEST
  * page_buffer.c - Page buffer management module (at the server)
  */
 

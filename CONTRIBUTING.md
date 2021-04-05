@@ -1,5 +1,7 @@
 First off, thank you for considering contributing to CUBRID. 
 
+TEST
+
 There are many ways to contribute, from submitting a bug report and a feature request, improving the documentation, sharing sample codes, writing a blog or issuing a patch.
 
 ## How to file a bug report and suggest a new feature
