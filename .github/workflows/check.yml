@@ -96,7 +96,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install packages
-        run: sudo apt-get install -y cppcheck 
+        run: |
+          sudo apt-get install -yq wget build-essential
+
+          # Download cppcheck-2.4.1 source
+          wget https://github.com/danmar/cppcheck/archive/2.4.1.tar.gz
+          tar xf 2.4.1.tar.gz
+
+          # build cppcheck-2.4.1
+          cd cppcheck-2.4.1
+          mkdir files
+          make -j4 install FILESDIR=files SRCDIR=build CFGDIR=cfg CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
+          cd ..
+
       - uses: actions/checkout@v2
       - uses: jitterbit/get-changed-files@v1
         id: files
