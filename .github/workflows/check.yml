@@ -106,7 +106,7 @@ jobs:
           # build cppcheck-2.4.1
           cd cppcheck-2.4.1
           mkdir files
-          make -j4 install FILESDIR=files SRCDIR=build CFGDIR=cfg CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
+          sudo make -j4 install FILESDIR=files SRCDIR=build CFGDIR=cfg CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
           cd ..
 
       - uses: actions/checkout@v2
