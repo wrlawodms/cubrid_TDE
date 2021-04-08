@@ -99,16 +99,18 @@ jobs:
         run: |
           sudo apt-get install -yq wget build-essential
 
+          wd=`pwd`
           # Download cppcheck-2.4.1 source
+          cd ..
           wget https://github.com/danmar/cppcheck/archive/2.4.1.tar.gz
           tar xf 2.4.1.tar.gz
-
+          
           # build cppcheck-2.4.1
           cd cppcheck-2.4.1
-          mkdir files
-          sudo make -j4 install FILESDIR=files SRCDIR=build CFGDIR=cfg CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
-          cd ..
-
+          make -j4 SRCDIR=build CFGDIR=cfg CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
+          export PATH=$PATH:`pwd`
+          
+          cd $wd
       - uses: actions/checkout@v2
       - uses: jitterbit/get-changed-files@v1
         id: files
