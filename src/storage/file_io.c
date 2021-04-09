@@ -1517,7 +1517,7 @@ fileio_lock_la_log_path (const char *db_full_name_p, const char *lock_path_p, in
 	  *last_deleted_arv_num = -1;
 	}
 
-      (void) fprintf (fp, "%-10d %s %d %s %ld", *last_deleted_arv_num, login_name, (int) GETPID (), host, time (NULL));
+      (void) fprintf (fp, "%-10d %s %d %s %ld", *last_deleted_arv_num, login_name, (int) GETPID (), host, time (NULL)); // cppcheck-suppress IOWithoutPositioning
       fflush (fp);
     }
   else
