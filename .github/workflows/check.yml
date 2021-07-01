@@ -149,17 +149,25 @@ jobs:
               continue
             fi
 
+            echo "$f is not directory"
+
             ext=$(expr $f : ".*\(\..*\)")
             if [ -z ${ext} ] ; then
               continue
             fi
+            
+            echo "ext of $f is $ext"
 
             case $ext in
             .c|.h|.cpp|.hpp|.C|.H|.CPP|.HPP) true;; # only these formats are checked.
             *) continue ;; # skip others
             esac
 
+            echo "$f will be processed"
+
             ${{ env.CPPCHECK_PATH }}/cppcheck --force -j4 --inline-suppr --suppressions-list=.github/workflows/cppcheck-spr-list --quiet --enable=warning -iheaplayers $f 2>>$result_file
+
+            echo "$f has been processed"
           done
 
           echo "errors: `cat $result_file | grep " error: " | wc -l`" > $summary_file
