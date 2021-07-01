@@ -42,9 +42,6 @@ jobs:
             fi
 
             ext=$(expr $f : ".*\(\..*\)")
-            if [ -z ${ext} ]; then
-              continue
-            fi
 
             case $ext in
             .c|.h|.cpp|.hpp|.C|.H|.CPP|.HPP|.ipp|.sh|.bat|.y|.l|.msg) true;; # only these formats are checked.
@@ -149,10 +146,9 @@ jobs:
               continue
             fi
 
+            set +e
             ext=$(expr $f : ".*\(\..*\)")
-            if [ -z ${ext} ] ; then
-              continue
-            fi
+            set -e
 
             case $ext in
             .c|.h|.cpp|.hpp|.C|.H|.CPP|.HPP) true;; # only these formats are checked.
