@@ -1,6 +1,9 @@
 f=$1  
 
 ext=$(expr $f : ".*\(\..*\)")
+if [ -z ${ext} ] ; then
+  exit
+fi
 
 case $ext in
 .c|.h|.i)
