@@ -53,6 +53,7 @@
 #include "log_compress.h"
 #include "thread_entry.hpp"
 #include "thread_manager.hpp"
+#include "tsc_timer.h"
 
 static void log_rv_undo_record (THREAD_ENTRY * thread_p, LOG_LSA * log_lsa, LOG_PAGE * log_page_p,
 				LOG_RCVINDEX rcvindex, const VPID * rcv_vpid, LOG_RCV * rcv,
@@ -3099,6 +3100,9 @@ log_recovery_redo (THREAD_ENTRY * thread_p, const LOG_LSA * start_redolsa, const
   LOG_ZIP *redo_unzip_ptr = NULL;
   bool is_diff_rec;
   bool is_mvcc_op = false;
+  TSC_TICKS info_logging_start_time;
+  TSCTIMEVAL info_logging_elapsed_time;
+  int info_logging_interval_in_secs = 5;
 
   aligned_log_pgbuf = PTR_ALIGN (log_pgbuf, MAX_ALIGNMENT);
 
@@ -3140,6 +3144,8 @@ log_recovery_redo (THREAD_ENTRY * thread_p, const LOG_LSA * start_redolsa, const
       return;
     }
 
+  tsc_start_time_usec (&info_logging_start_time);
+
   while (!LSA_ISNULL (&lsa))
     {
       /* Fetch the page where the LSA record to undo is located */
@@ -3156,6 +3162,12 @@ log_recovery_redo (THREAD_ENTRY * thread_p, const LOG_LSA * start_redolsa, const
 	      logpb_fatal_error (thread_p, true, ARG_FILE_LINE, "log_recovery_redo");
 	      return;
 	    }
+	}
+
+      tsc_end_time_usec (&info_logging_elapsed_time, info_logging_start_time);
+      if (info_logging_elapsed_time.tv_sec >= info_logging_interval_in_secs)
+	{
+	  tsc_start_time_usec (&info_logging_start_time);
 	}
 
       /* Check all log records in this phase */
@@ -4572,6 +4584,9 @@ log_recovery_undo (THREAD_ENTRY * thread_p)
   bool is_mvcc_op;
   volatile TRANID tran_id;
   volatile LOG_RECTYPE log_rtype;
+  TSC_TICKS info_logging_start_time;
+  TSCTIMEVAL info_logging_elapsed_time;
+  int info_logging_interval_in_secs = 5;
 
   aligned_log_pgbuf = PTR_ALIGN (log_pgbuf, MAX_ALIGNMENT);
 
@@ -4644,6 +4659,8 @@ log_recovery_undo (THREAD_ENTRY * thread_p)
       return;
     }
 
+  tsc_start_time_usec (&info_logging_start_time);
+
   while (!LSA_ISNULL (&max_undo_lsa))
     {
       /* Fetch the page where the LSA record to undo is located */
@@ -4654,6 +4671,12 @@ log_recovery_undo (THREAD_ENTRY * thread_p)
 
 	  logpb_fatal_error (thread_p, true, ARG_FILE_LINE, "log_recovery_undo");
 	  return;
+	}
+
+      tsc_end_time_usec (&info_logging_elapsed_time, info_logging_start_time);
+      if (info_logging_elapsed_time.tv_sec >= info_logging_interval_in_secs)
+	{
+	  tsc_start_time_usec (&info_logging_start_time);
 	}
 
       /* Check all log records in this phase */
