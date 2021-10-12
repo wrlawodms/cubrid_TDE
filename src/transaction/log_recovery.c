@@ -3103,6 +3103,7 @@ log_recovery_redo (THREAD_ENTRY * thread_p, const LOG_LSA * start_redolsa, const
   TSC_TICKS info_logging_start_time, info_logging_check_time;
   TSCTIMEVAL info_logging_elapsed_time;
   int info_logging_interval_in_secs = 0;
+  UINT64 total_page_cnt = log_cnt_pages_containing_lsa (start_redolsa, end_redo_lsa);
 
   aligned_log_pgbuf = PTR_ALIGN (log_pgbuf, MAX_ALIGNMENT);
 
@@ -3181,8 +3182,10 @@ log_recovery_redo (THREAD_ENTRY * thread_p, const LOG_LSA * start_redolsa, const
 	  if (info_logging_elapsed_time.tv_sec >= info_logging_interval_in_secs)
 	    {
 	      UINT64 done_page_cnt = log_lsa.pageid - start_redolsa->pageid;
-	      UINT64 total_page_cnt = end_redo_lsa->pageid - start_redolsa->pageid;
-	      if (done_page_cnt > 0 && total_page_cnt > 0)
+
+	      assert (total_page_cnt >= done_page_cnt);
+
+	      if (done_page_cnt > 0)
 		{
 		  double elapsed_time;
 		  double progress = double (done_page_cnt) / (total_page_cnt);
@@ -4617,6 +4620,7 @@ log_recovery_undo (THREAD_ENTRY * thread_p)
   TSC_TICKS info_logging_start_time, info_logging_check_time;
   TSCTIMEVAL info_logging_elapsed_time;
   int info_logging_interval_in_secs = 0;
+  UINT64 total_page_cnt = 0;
 
   aligned_log_pgbuf = PTR_ALIGN (log_pgbuf, MAX_ALIGNMENT);
 
@@ -4678,6 +4682,8 @@ log_recovery_undo (THREAD_ENTRY * thread_p)
   });
   // *INDENT-ON*
 
+  total_page_cnt = log_cnt_pages_containing_lsa (&min_lsa, &max_lsa);
+
   er_set (ER_NOTIFICATION_SEVERITY, ARG_FILE_LINE, ER_LOG_RECOVERY_UNDO_STARTED, 2,
 	  log_cnt_pages_containing_lsa (&max_undo_lsa, &min_lsa), cnt_trans_to_undo);
 
@@ -4721,8 +4727,10 @@ log_recovery_undo (THREAD_ENTRY * thread_p)
 	  //if (info_logging_elapsed_time.tv_sec >= info_logging_interval_in_secs)
 	  {
 	    UINT64 done_page_cnt = max_lsa.pageid - log_lsa.pageid;
-	    UINT64 total_page_cnt = max_lsa.pageid - min_lsa.pageid;
-	    if (done_page_cnt > 0 && total_page_cnt > 0)
+
+	    assert (total_page_cnt >= done_page_cnt);
+
+	    if (done_page_cnt > 0)
 	      {
 		double elapsed_time;
 		double progress = double (done_page_cnt) / (total_page_cnt);
