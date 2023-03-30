@@ -163,7 +163,7 @@ tran_server::send_receive (tran_to_page_request reqid, std::string &&payload_in,
    *  - Normal disconnection: in receive_disconnect_request() and disconnect_all_page_servers()
    *  - Abnormal disconnection: in the error handler, here, or somewhere else (TODO)
    */
-  m_page_server_conn_vec_cv.wait (s_lock, [&] ()
+  m_main_conn_cv.wait (s_lock, [&] ()
   {
     if (m_page_server_conn_vec.empty ())
       {
@@ -366,7 +366,6 @@ tran_server::disconnect_all_page_servers ()
     std::lock_guard<std::shared_mutex> lk_guard (m_page_server_conn_vec_mtx);
     m_page_server_conn_vec.swap (conn_vec);
   }
-  m_page_server_conn_vec_cv.notify_all ();
 
   // finalize connections out of the mutex, m_page_server_conn_vec_mtx, since it joins request handler thread internally, and receive_disconnect_request() also acquires the lock of the mutex.
   conn_vec.clear ();
@@ -438,6 +437,7 @@ tran_server::connection_handler::get_request_handlers ()
 void
 tran_server::connection_handler::receive_disconnect_request (page_server_conn_t::sequenced_payload &a_ip)
 {
+  bool main_conn_changed = false;
   m_conn->stop_response_broker (); // wake up threads waiting for a response and tell them it won't be served.
 
   {
@@ -449,6 +449,17 @@ tran_server::connection_handler::receive_disconnect_request (page_server_conn_t:
       {
 	if (it->get () == this)
 	  {
+	    // We assume the first one is the main connection.
+	    if (it == conn_vec.begin())
+	      {
+		assert_release (conn_vec.size() > 1); // For now, it's not allowed to have no connection.
+
+		main_conn_changed = true;
+
+		_er_log_debug (ARG_FILE_LINE, "The main connection is changed from %s to %s.\n",
+			       (*it)->get_channel_id ().c_str (), (* (it+1))->get_channel_id ().c_str ());
+	      }
+
 	    m_ts.m_async_disconnect_handler.disconnect (std::move (*it));
 	    assert (*it == nullptr);
 	    conn_vec.erase (it);
@@ -456,10 +467,12 @@ tran_server::connection_handler::receive_disconnect_request (page_server_conn_t:
 	  }
       }
   }
-
-  m_ts.m_page_server_conn_vec_cv.notify_all ();
-
   // It's possible that the connection is already cleared in disconnect_all_page_servers()
+
+  if (main_conn_changed)
+    {
+      m_ts.m_main_conn_cv.notify_all ();
+    }
 }
 
 void
