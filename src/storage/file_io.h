@@ -454,8 +454,9 @@ struct flush_stats
   unsigned int num_tokens;
 };
 
+#include <map>
 // *INDENT-OFF*
-using FILEIO_UNLINKED_VOLINFO = std::vector <std::tuple <int, std::string, std::string>>;
+using FILEIO_UNLINKED_VOLINFO_MAP = std::map <int, std::pair<std::string, std::string>>; // volid, to_vol, prev_vol
 // *INDENT-ON*
 
 extern int fileio_open (const char *vlabel, int flags, int mode);
@@ -582,7 +583,7 @@ extern int fileio_get_next_restore_file (THREAD_ENTRY * thread_p, FILEIO_BACKUP_
 extern int fileio_restore_volume (THREAD_ENTRY * thread_p, FILEIO_BACKUP_SESSION * session, char *to_vlabel,
 				  char *verbose_to_vlabel, char *prev_vlabel, FILEIO_RESTORE_PAGE_BITMAP * page_bitmap,
 				  bool remember_pages, bool & is_prev_vheader_restored,
-				  FILEIO_UNLINKED_VOLINFO & unlinked_vol_info);
+				  FILEIO_UNLINKED_VOLINFO_MAP & unlinked_vol_info);
 extern int fileio_skip_restore_volume (THREAD_ENTRY * thread_p, FILEIO_BACKUP_SESSION * session);
 extern const char *fileio_get_zip_method_string (FILEIO_ZIP_METHOD zip_method);
 extern const char *fileio_get_zip_level_string (FILEIO_ZIP_LEVEL zip_level);

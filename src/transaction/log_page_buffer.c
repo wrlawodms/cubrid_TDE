@@ -8417,7 +8417,7 @@ logpb_restore (THREAD_ENTRY * thread_p, const char *db_fullname, const char *log
 
   bool is_prev_volheader_restored = false;
   // *INDENT-OFF*
-  FILEIO_UNLINKED_VOLINFO unlinked_volinfo;
+  FILEIO_UNLINKED_VOLINFO_MAP unlinked_volinfo;
   // *INDENT-ON*
 
   try_level = (FILEIO_BACKUP_LEVEL) r_args->level;
@@ -8865,16 +8865,15 @@ logpb_restore (THREAD_ENTRY * thread_p, const char *db_fullname, const char *log
 
   // Incremental backup volumes often do not include volume header pages.
   // Accordingly, it is necessary to set unlinked volumes after all volume header pages are restored.
-  for (int i = 0; i < unlinked_volinfo.size (); i++)
+for (const auto &[volid, vol_names]:unlinked_volinfo)
     {
-      VOLID prev_volid, volid;
+      VOLID prev_volid;
       int prev_vdes;
       const char *prev_volname, *volname;
 
       // *INDENT-OFF*
-      volid = get<0> (unlinked_volinfo[i]);
-      volname = get<1> (unlinked_volinfo[i]).c_str ();
-      prev_volname = get<2> (unlinked_volinfo[i]).c_str ();
+      volname = vol_names.first.c_str();
+      prev_volname = vol_names.second.c_str();
       // *INDENT-ON*
 
       prev_volid = fileio_find_previous_perm_volume (thread_p, volid);
