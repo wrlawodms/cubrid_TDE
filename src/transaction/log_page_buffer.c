@@ -376,6 +376,7 @@ static int logpb_append_prior_lsa_list (THREAD_ENTRY * thread_p, LOG_PRIOR_NODE 
 static int logpb_copy_page (THREAD_ENTRY * thread_p, LOG_PAGEID pageid, LOG_CS_ACCESS_MODE access_mode,
 			    LOG_PAGE * log_pgptr);
 static int logpb_request_log_page_from_page_server (LOG_PAGEID log_pageid, LOG_PAGE * log_pgptr);
+static int logpb_request_log_hdr_page_on_boot_from_page_server (LOG_PAGE * log_pgptr);
 
 static void logpb_fatal_error_internal (THREAD_ENTRY * thread_p, bool log_exit, bool need_flush, const char *file_name,
 					const int lineno, const char *fmt, va_list ap);
@@ -1608,7 +1609,7 @@ logpb_fetch_header_from_page_server (LOG_HEADER * hdr, LOG_PAGE * log_pgptr)
 {
   assert (is_tran_server_with_remote_storage ());
 
-  int err = logpb_request_log_page_from_page_server (LOGPB_HEADER_PAGE_ID, log_pgptr);
+  int err = logpb_request_log_hdr_page_on_boot_from_page_server (log_pgptr);
   if (err != NO_ERROR)
     {
       ASSERT_ERROR ();
@@ -1648,6 +1649,7 @@ logpb_fetch_header_from_file_or_page_server (THREAD_ENTRY * thread_p, const char
   LOG_PAGE *const log_pgptr = (LOG_PAGE *) aligned_log_pgbuf;
 
   assert (hdr != nullptr);
+  assert (log_Gl.rcv_phase != LOG_RESTARTED);
 
 #if defined (SERVER_MODE)
   int res_code = NO_ERROR;
@@ -1667,19 +1669,7 @@ logpb_fetch_header_from_file_or_page_server (THREAD_ENTRY * thread_p, const char
   const int res_code = logpb_fetch_header_from_file (thread_p, db_fullname, logpath, prefix_logname, hdr, log_pgptr);
 #endif // SERVER_MODE
 
-  if (res_code != NO_ERROR)
-    {
-      return res_code;
-    }
-
-#if !defined(NDEBUG)
-  if (log_Gl.rcv_phase == LOG_RESTARTED)
-    {
-      logpb_debug_check_log_page (thread_p, log_pgptr);
-    }
-#endif
-
-  return NO_ERROR;
+  return res_code;
 }
 
 // it peeks header page of the backuped log active file
@@ -2099,9 +2089,8 @@ exit:
 static int
 logpb_request_log_page_from_page_server (LOG_PAGEID log_pageid, LOG_PAGE * log_pgptr)
 {
-  // *INDENT-OFF*
   std::string request_message;
-  request_message.append (reinterpret_cast<const char *> (&log_pageid), sizeof (log_pageid));
+  request_message.append (reinterpret_cast < const char *>(&log_pageid), sizeof (log_pageid));
 
   const bool perform_logging = prm_get_bool_value (PRM_ID_ER_LOG_READ_LOG_PAGE);
   if (perform_logging)
@@ -2110,8 +2099,8 @@ logpb_request_log_page_from_page_server (LOG_PAGEID log_pageid, LOG_PAGE * log_p
     }
   std::string response_message;
   int error_code = ts_Gl->send_receive (tran_to_page_request::SEND_LOG_PAGE_FETCH,
-                                           std::move (request_message), response_message);
-  // there are two layers of errors to he handled here:
+					std::move (request_message), response_message);
+  // there are two layers of errors to be handled here:
   //  - client side communication to page server error
   //  - page server side errors
 
@@ -2120,9 +2109,10 @@ logpb_request_log_page_from_page_server (LOG_PAGEID log_pageid, LOG_PAGE * log_p
     {
       ASSERT_ERROR ();
       if (perform_logging)
-        {
-	  _er_log_debug (ARG_FILE_LINE, "[READ LOG] Received error log page message from Page Server. Error code: %d\n", error_code);
-        }
+	{
+	  _er_log_debug (ARG_FILE_LINE, "[READ LOG] Received error log page message from Page Server. Error code: %d\n",
+			 error_code);
+	}
 
       // TODO handling the case such as shutdown
       assert_release (error_code != ER_CONN_NO_PAGE_SERVER_AVAILABLE);
@@ -2157,12 +2147,12 @@ logpb_request_log_page_from_page_server (LOG_PAGEID log_pageid, LOG_PAGE * log_p
 	}
       if (perform_logging)
 	{
-	  _er_log_debug (ARG_FILE_LINE, "[READ LOG] Received error log page message from Page Server. Error code: %d\n", error_code);
+	  _er_log_debug (ARG_FILE_LINE, "[READ LOG] Received error log page message from Page Server. Error code: %d\n",
+			 error_code);
 	}
     }
   assert (message_ptr == (response_message.c_str () + response_message.size ()));
   return error_code;
-  // *INDENT-ON*
 }
 
 // *INDENT-OFF*
@@ -2171,6 +2161,7 @@ logpb_respond_fetch_log_page_request (THREAD_ENTRY &thread_r, std::string &paylo
 {
   assert (is_page_server ());
 
+  // *INDENT-OFF*
   // Unpack the message data
   LOG_PAGEID log_pageid;
   assert (payload_in_out.size () == sizeof (log_pageid));
@@ -2203,8 +2194,127 @@ logpb_respond_fetch_log_page_request (THREAD_ENTRY &thread_r, std::string &paylo
       // pack page data too
       payload_in_out.append (reinterpret_cast<const char *> (lr.get_page ()), LOG_PAGESIZE);
     }
+  // *INDENT-ON*
 }
-// *INDENT-ON*
+
+/*
+ * Similar to logpb_request_log_page_from_page_server, but for the special case while booting.
+ * Before the log page size is determined while booting, the page size for the header can be different
+ * than expected because the information itself is in the log header page.
+ */
+static int
+logpb_request_log_hdr_page_on_boot_from_page_server (LOG_PAGE * log_pgptr)
+{
+  // On boot Only; It can be used in other cases, but logpb_request_log_page_from_page_server is
+  // better since that costs less. 
+  assert (log_Gl.rcv_phase != LOG_RESTARTED);
+
+  const bool perform_logging = prm_get_bool_value (PRM_ID_ER_LOG_READ_LOG_PAGE);
+  if (perform_logging)
+    {
+      _er_log_debug (ARG_FILE_LINE, "[READ LOG] Sent request for log to Page Server. Page ID: %lld \n",
+		     LOGPB_HEADER_PAGE_ID);
+    }
+  std::string response_message;
+  int error_code = ts_Gl->send_receive (tran_to_page_request::SEND_LOG_HDR_PAGE_FETCH_ON_BOOT,
+					"", response_message);
+  // there are two layers of errors to be handled here:
+  //  - client side communication to page server error
+  //  - page server side errors
+
+  // client side communication to page server error
+  if (error_code != NO_ERROR)
+    {
+      ASSERT_ERROR ();
+      if (perform_logging)
+	{
+	  _er_log_debug (ARG_FILE_LINE, "[READ LOG] Received error log page message from Page Server. Error code: %d\n",
+			 error_code);
+	}
+
+      // TODO handling the case such as shutdown
+      assert_release (error_code != ER_CONN_NO_PAGE_SERVER_AVAILABLE);
+      return error_code;
+    }
+
+  assert (response_message.size () > 0);
+  const char *message_ptr = response_message.c_str ();
+  std::memcpy (&error_code, message_ptr, sizeof (error_code));
+  message_ptr += sizeof (error_code);
+
+  if (error_code == NO_ERROR)
+    {
+      PGLENGTH log_page_size = 0;
+      std::memcpy (&log_page_size, message_ptr, sizeof (log_page_size));
+      message_ptr += sizeof (LOG_PAGESIZE);
+
+      assert_release (log_page_size >= IO_MIN_PAGE_SIZE
+		      && log_page_size <= IO_MAX_PAGE_SIZE && IS_POWER_OF_2 (log_page_size));
+
+      std::memcpy (log_pgptr, message_ptr, log_page_size);
+      message_ptr += log_page_size;
+
+      assert (LOGPB_HEADER_PAGE_ID == log_pgptr->hdr.logical_pageid);
+
+      if (perform_logging)
+	{
+	  _er_log_debug (ARG_FILE_LINE, "[READ LOG] Received log page message from Page Server. Page ID: %lld\n",
+			 log_pgptr->hdr.logical_pageid);
+	}
+    }
+  else
+    {
+      if (error_code == ER_LOG_PAGE_CORRUPTED)
+	{
+	  er_set (ER_ERROR_SEVERITY, ARG_FILE_LINE, ER_LOG_PAGE_CORRUPTED, 1, LOGPB_HEADER_PAGE_ID);
+	}
+      else
+	{
+	  er_set (ER_ERROR_SEVERITY, ARG_FILE_LINE, ER_GENERIC_ERROR, 0);
+	}
+      if (perform_logging)
+	{
+	  _er_log_debug (ARG_FILE_LINE, "[READ LOG] Received error log page message from Page Server. Error code: %d\n",
+			 error_code);
+	}
+    }
+  return error_code;
+}
+
+void
+logpb_respond_fetch_log_hdr_page_on_boot_request (THREAD_ENTRY & thread_r, std::string & payload_in_out)
+{
+  assert (is_page_server ());
+
+  // *INDENT-OFF*
+  log_lsa fetch_lsa { LOGPB_HEADER_PAGE_ID, 0 };
+  log_reader lr { LOG_CS_SAFE_READER };
+
+  // Make sure log page header is updated
+  logpb_force_flush_header_and_pages (&thread_r);
+
+  int error = lr.set_lsa_and_fetch_page (fetch_lsa);
+
+  // Response message
+  if (prm_get_bool_value (PRM_ID_ER_LOG_READ_LOG_PAGE))
+    {
+      _er_log_debug (ARG_FILE_LINE,
+		     "[READ LOG] Sending log page to Active Tran Server. Page ID: %lld Error code: %ld\n",
+		     LOGPB_HEADER_PAGE_ID, error);
+    }
+
+  // pack error first
+  payload_in_out = { reinterpret_cast <const char *>(&error), sizeof (error) };
+
+  if (error == NO_ERROR)
+    {
+      // pack page data too
+      PGLENGTH log_page_size = LOG_PAGESIZE;
+      payload_in_out.append (reinterpret_cast <const char*>(&log_page_size), sizeof (log_page_size));
+      payload_in_out.append (reinterpret_cast <const char*>(lr.get_page ()), LOG_PAGESIZE);
+    }
+  // *INDENT-ON*
+}
 #endif // SERVER_MODE
 
 #if defined (SERVER_MODE)
