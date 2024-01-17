@@ -45,10 +45,6 @@ passive_tran_server::get_remote_storage_config ()
 int
 passive_tran_server::prepare_connections ()
 {
-  for (const auto &conn : m_page_server_conn_vec)
-    {
-      conn->set_connected ();
-    }
   return NO_ERROR;
 }
 

@@ -709,14 +709,6 @@ tran_server::connection_handler::get_channel_id () const
   return m_conn->get_underlying_channel_id ();
 }
 
-void
-tran_server::connection_handler::set_connected ()
-{
-  auto slock = std::shared_lock<std::shared_mutex> { m_state_mtx };
-  assert (m_state == state::CONNECTING);
-  m_state = state::CONNECTED;
-}
-
 bool
 tran_server::connection_handler::is_connected ()
 {
