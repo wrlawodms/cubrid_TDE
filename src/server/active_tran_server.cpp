@@ -142,6 +142,12 @@ active_tran_server::get_remote_storage_config ()
   return m_uses_remote_storage;
 }
 
+int
+active_tran_server::prepare_connections ()
+{
+  return NO_ERROR;
+}
+
 void
 active_tran_server::stop_outgoing_page_server_messages ()
 {

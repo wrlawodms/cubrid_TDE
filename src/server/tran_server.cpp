@@ -125,6 +125,13 @@ tran_server::boot (const char *db_name)
       return error_code;
     }
 
+  error_code = prepare_connections ();
+  if (error_code != NO_ERROR)
+    {
+      ASSERT_ERROR ();
+      return error_code;
+    }
+
   /*
     * At least one PS is given by the configuration.
     * Even if uses_remote_storage () == false, the remote storage can exist.

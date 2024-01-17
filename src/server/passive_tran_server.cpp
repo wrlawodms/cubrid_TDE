@@ -42,6 +42,12 @@ passive_tran_server::get_remote_storage_config ()
   return true;
 }
 
+int
+passive_tran_server::prepare_connections ()
+{
+  return NO_ERROR;
+}
+
 passive_tran_server::connection_handler::request_handlers_map_t
 passive_tran_server::connection_handler::get_request_handlers ()
 {

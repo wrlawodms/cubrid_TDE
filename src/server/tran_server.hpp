@@ -198,6 +198,8 @@ class tran_server
     // Booting functions that require specialization
     virtual bool get_remote_storage_config () = 0;
 
+    virtual int prepare_connections () = 0;
+
   protected:
     /*
      * Static information about available page server connection peers.
