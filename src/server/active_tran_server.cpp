@@ -145,6 +145,13 @@ active_tran_server::get_remote_storage_config ()
 int
 active_tran_server::prepare_connections ()
 {
+  /*
+   * 1. collect SAVED_LSAs from all PSs. (TODO)
+   * 3. Prepare:
+   *  - get it ready to receive prior nodes
+   *  - request catchup to PS if needed, otherwise set it CONNECTED.
+   */
+
   for (const auto &conn : m_page_server_conn_vec)
     {
       conn->set_connected ();
