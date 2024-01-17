@@ -115,7 +115,7 @@ class tran_server
 
 	// Do the server-type-specific jobs and transition state from CONNECTING to CONNECTED.
 	// The m_state MUST be changed to CONNECTED either synchronously or asynchronously.
-	virtual void transition_to_connected () = 0;
+	virtual void prepare () = 0;
 
 	int push_request (tran_to_page_request reqid, std::string &&payload);
 	int send_receive (tran_to_page_request reqid, std::string &&payload_in, std::string &payload_out);

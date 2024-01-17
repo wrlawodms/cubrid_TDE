@@ -779,7 +779,7 @@ tran_server::ps_connector::try_connect_to_all_ps (cubthread::entry &)
 	  if (conn->connect () == NO_ERROR)
 	    {
 	      newly_connected = true;
-	      conn->transition_to_connected ();
+	      conn->prepare ();
 	    }
 	}
 

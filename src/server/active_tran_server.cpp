@@ -155,8 +155,8 @@ active_tran_server::prepare_connections ()
   for (const auto &conn : m_page_server_conn_vec)
     {
       // Do the preliminary jobs depending on the server type before opening the connection to the outside.
-      // the state will be transitioned to CONNECTED by transition_to_connected().
-      conn->transition_to_connected ();
+      // the state will be transitioned to CONNECTED by prepare().
+      conn->prepare ();
     }
   return NO_ERROR;
 }
@@ -254,7 +254,7 @@ active_tran_server::connection_handler::get_saved_lsa () const
 }
 
 void
-active_tran_server::connection_handler::transition_to_connected ()
+active_tran_server::connection_handler::prepare ()
 {
   assert (m_prior_sender_sink_hook_func == nullptr);
 

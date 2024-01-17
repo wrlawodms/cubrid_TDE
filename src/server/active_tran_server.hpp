@@ -52,7 +52,7 @@ class active_tran_server : public tran_server
 
 	~connection_handler () override;
 
-	void transition_to_connected () override final;
+	void prepare () override final;
 
       private:
 	request_handlers_map_t get_request_handlers () final override;

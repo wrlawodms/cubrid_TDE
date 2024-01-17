@@ -48,8 +48,8 @@ passive_tran_server::prepare_connections ()
   for (const auto &conn : m_page_server_conn_vec)
     {
       // Do the preliminary jobs depending on the server type before opening the connection to the outside.
-      // the state will be transitioned to CONNECTED by transition_to_connected().
-      conn->transition_to_connected ();
+      // the state will be transitioned to CONNECTED by prepare().
+      conn->prepare ();
     }
   return NO_ERROR;
 }
@@ -76,7 +76,7 @@ passive_tran_server::connection_handler::get_saved_lsa () const
 }
 
 void
-passive_tran_server::connection_handler::transition_to_connected ()
+passive_tran_server::connection_handler::prepare ()
 {
   auto lockg_state = std::lock_guard<std::shared_mutex> { m_state_mtx };
   assert (m_state == state::CONNECTING);
