@@ -117,8 +117,11 @@ class tran_server
 	int send_receive (tran_to_page_request reqid, std::string &&payload_in, std::string &payload_out);
 
 	const std::string get_channel_id () const;
+
+	void set_connected ();
 	bool is_connected ();
 	bool is_idle ();
+
 	const cubcomm::node &get_node () const;
 
 	virtual log_lsa get_saved_lsa () const = 0; // used in active_tran_server
