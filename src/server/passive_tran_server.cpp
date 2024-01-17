@@ -45,10 +45,12 @@ passive_tran_server::get_remote_storage_config ()
 int
 passive_tran_server::prepare_connections ()
 {
+  /*
+   *  Prepare: set it CONNECTED.
+   *  - If some prelimiary jobs are needed, do them here or in prepare() if connection-specific.
+   */
   for (const auto &conn : m_page_server_conn_vec)
     {
-      // Do the preliminary jobs depending on the server type before opening the connection to the outside.
-      // the state will be transitioned to CONNECTED by prepare().
       conn->prepare ();
     }
   return NO_ERROR;

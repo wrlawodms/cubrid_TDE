@@ -146,16 +146,14 @@ int
 active_tran_server::prepare_connections ()
 {
   /*
-   * 1. collect SAVED_LSAs from all PSs. (TODO)
-   * 3. Prepare:
+   * 1. Collect SAVED_LSAs from all PSs. (TODO)
+   * 2. Prepare:
    *  - get it ready to receive prior nodes
    *  - request catchup to PS if needed, otherwise set it CONNECTED.
    */
 
   for (const auto &conn : m_page_server_conn_vec)
     {
-      // Do the preliminary jobs depending on the server type before opening the connection to the outside.
-      // the state will be transitioned to CONNECTED by prepare().
       conn->prepare ();
     }
   return NO_ERROR;
