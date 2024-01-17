@@ -154,7 +154,9 @@ active_tran_server::prepare_connections ()
 
   for (const auto &conn : m_page_server_conn_vec)
     {
-      //
+      // Do the preliminary jobs depending on the server type before opening the connection to the outside.
+      // the state will be transitioned to CONNECTED by transition_to_connected().
+      conn->transition_to_connected ();
     }
   return NO_ERROR;
 }

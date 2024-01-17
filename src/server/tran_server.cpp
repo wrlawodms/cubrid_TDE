@@ -418,10 +418,6 @@ tran_server::connection_handler::connect ()
 		  srv_chn.get_channel_id ().c_str ());
   }
 
-  // Do the preliminary jobs depending on the server type before opening the connection to the outside.
-  // the state will be transitioned to CONNECTED by transition_to_connected().
-  transition_to_connected ();
-
   return NO_ERROR;
 }
 
@@ -783,6 +779,7 @@ tran_server::ps_connector::try_connect_to_all_ps (cubthread::entry &)
 	  if (conn->connect () == NO_ERROR)
 	    {
 	      newly_connected = true;
+	      conn->transition_to_connected ();
 	    }
 	}
 

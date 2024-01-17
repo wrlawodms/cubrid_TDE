@@ -113,6 +113,10 @@ class tran_server
 	void disconnect_async (bool with_disc_msg);
 	void wait_async_disconnection ();
 
+	// Do the server-type-specific jobs and transition state from CONNECTING to CONNECTED.
+	// The m_state MUST be changed to CONNECTED either synchronously or asynchronously.
+	virtual void transition_to_connected () = 0;
+
 	int push_request (tran_to_page_request reqid, std::string &&payload);
 	int send_receive (tran_to_page_request reqid, std::string &&payload_in, std::string &payload_out);
 
@@ -163,9 +167,6 @@ class tran_server
 	virtual request_handlers_map_t get_request_handlers ();
 	void push_request_regardless_of_state (tran_to_page_request reqid, std::string &&payload);
 
-	// Do the server-type-specific jobs and transition state from CONNECTING to CONNECTED.
-	// The m_state MUST be changed to CONNECTED either synchronously or asynchronously.
-	virtual void transition_to_connected () = 0;
 	// Do the server-type-specific jobs before disconnected. DISCONNECTING -> (*) -> IDLE
 	virtual void on_disconnecting () = 0;
 
